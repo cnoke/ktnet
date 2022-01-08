@@ -1,5 +1,7 @@
-package com.cnoke.ktnet
+package com.cnoke.base
 
+import com.cnoke.base.bean.ApiPagerResponse
+import com.cnoke.base.bean.ApiResponse
 import com.cnoke.net.exception.ParseException
 import com.cnoke.net.factory.GsonResponseBodyConverter
 import okhttp3.ResponseBody

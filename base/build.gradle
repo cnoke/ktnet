@@ -1,20 +1,16 @@
 plugins {
-    id 'com.android.application'
+    id 'com.android.library'
     id 'kotlin-android'
 }
 
 android {
     compileSdkVersion Versions.compileSdkVersion
-    buildToolsVersion Versions.buildToolsVersion
-
     defaultConfig {
-        applicationId "com.cnoke.ktnet"
         minSdkVersion Versions.minSdkVersion
         targetSdkVersion Versions.targetSdkVersion
         versionCode Versions.versionCode
         versionName Versions.versionName
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'proguard-rules.pro'
     }
 
     buildTypes {
@@ -33,6 +29,20 @@ android {
 }
 
 dependencies {
-    implementation Kt.stdlibJdk8
-    api project(':base')
+
+    api AndroidX.appcompat
+    api AndroidX.coreKtx
+    api AndroidX.constraintlayout
+    api AndroidX.material
+    //lifecycle
+    api Lifecycle.runtime
+    api Lifecycle.common
+    api Lifecycle.extensions
+    // viewModel
+    api Lifecycle.viewmodel
+    // liveData
+    api Lifecycle.livedata
+    //利用liveData发送消息
+//    api Lifecycle.unpeek
+    api project(':net')
 }

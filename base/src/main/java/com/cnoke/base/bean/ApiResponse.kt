@@ -1,4 +1,4 @@
-package com.cnoke.base
+package com.cnoke.base.bean
 
 /**
  * @date on 2022/1/7

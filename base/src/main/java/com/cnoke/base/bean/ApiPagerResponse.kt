@@ -1,4 +1,4 @@
-package com.cnoke.base
+package com.cnoke.base.bean
 
 import java.io.Serializable
 

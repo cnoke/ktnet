@@ -5,6 +5,9 @@ import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.cnoke.base.bean.ApiResponse
+import com.cnoke.base.MyGsonResponseBodyConverter
+import com.cnoke.base.activity.BaseActivity
 import com.cnoke.net.await
 import com.cnoke.net.factory.ApiResultCallAdapterFactory
 import com.cnoke.net.factory.GsonConverterFactory
@@ -20,50 +23,15 @@ import retrofit2.Retrofit
  * @title
  * @describe
  */
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity<MainViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(HeadInterceptor())
-            .addInterceptor(LogInterceptor())
-            .build()
-
-        val retrofit = Retrofit.Builder()
-            .client(okHttpClient)
-            .baseUrl("https://www.wanandroid.com/")
-            .addCallAdapterFactory(ApiResultCallAdapterFactory())
-            .addConverterFactory(GsonConverterFactory.create(ApiResponse::class.java,MyGsonResponseBodyConverter()))
-            .build()
-        val service: TestServer = retrofit.create(TestServer::class.java)
-
         val view = findViewById<TextView>(R.id.tv_name)
         view.setOnClickListener {
-            lifecycleScope.launch {
-                val awaitBanner = service.awaitBanner().await {
-                    Log.e("awaitBanner",it.toString())
-                    listOf()
-                }
-
-                awaitBanner.let {
-                    for(banner in it){
-                        Log.e("awaitBanner",banner.title)
-                    }
-                }
-
-
-                kotlin.runCatching {
-                    val banner = service.banner()
-                    for(item in banner){
-                        Log.e("banner",item.title)
-                    }
-                }.onFailure {
-                    Log.e("banner",it.toString())
-                }
-
-            }
+            mViewModel.banner()
         }
     }
 }

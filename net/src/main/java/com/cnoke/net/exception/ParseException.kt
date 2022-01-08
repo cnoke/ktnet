@@ -10,11 +10,8 @@ import java.io.IOException
  */
 class ParseException(code: String, message: String?) :
     IOException(message) {
-    private val errorCode: String = code
 
-    fun getErrorCode(): String {
-        return errorCode
-    }
+    val errorCode: String = code
 
     override fun getLocalizedMessage(): String {
         return errorCode
