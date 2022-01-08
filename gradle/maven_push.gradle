@@ -1,0 +1,98 @@
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+def sonatypeRepositoryUrl
+
+def isReleaseBuild() {
+    return VERSION_NAME.contains("SNAPSHOT") == false
+}
+if (isReleaseBuild()) {
+    println 'RELEASE BUILD'
+    sonatypeRepositoryUrl = hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
+            : "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+} else {
+    println 'DEBUG BUILD'
+    sonatypeRepositoryUrl = hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
+            : "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+}
+
+def getRepositoryUsername() {
+    return hasProperty('ossrhUsername') ? ossrhUsername : ""
+}
+
+def getRepositoryPassword() {
+    return hasProperty('ossrhPassword') ? ossrhPassword : ""
+}
+
+//第 1 处
+ext["signing.keyId"] = '' //签名的密钥后8位
+ext["signing.password"] = ''  //签名设置的密码
+ext["signing.secretKeyRingFile"] = '' //生成的secring.gpg文件目录
+ext["ossrhUsername"] = ''  //sonatype用户名
+ext["ossrhPassword"] = ''  //sonatype密码
+
+
+File secretPropsFile = project.rootProject.file('local.properties')
+if (secretPropsFile.exists()) {
+    println "Found secret props file, loading props"
+    Properties p = new Properties()
+    p.load(new FileInputStream(secretPropsFile))
+    p.each { name, value ->
+        ext[name] = value
+    }
+} else {
+    println "No props file, loading env vars"
+}
+
+afterEvaluate { project ->
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { deployment -> signing.signPom(deployment) }
+                pom.groupId = GROUP_ID
+                pom.artifactId = POM_ARTIFACT_ID
+                pom.version = VERSION_NAME
+
+                repository(url: sonatypeRepositoryUrl) {
+                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                }
+
+                pom.project {
+                    name POM_NAME
+                    packaging POM_PACKAGING
+                    description POM_DESCRIPTION
+                    url POM_URL
+
+                    scm {
+                        url POM_SCM_URL
+                        connection POM_SCM_CONNECTION
+                        developerConnection POM_SCM_DEV_CONNECTION
+                    }
+
+                    licenses {
+                        license {
+                            name POM_LICENCE_NAME
+                            url POM_LICENCE_URL
+                            distribution POM_LICENCE_DIST
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id POM_DEVELOPER_ID
+                            name POM_DEVELOPER_NAME
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    signing {
+        println 'Signing archives...'
+        sign configurations.archives
+    }
+
+
+}
+

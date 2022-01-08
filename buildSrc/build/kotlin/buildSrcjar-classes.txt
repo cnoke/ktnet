@@ -1,0 +1,1 @@
+D:\code\ktnet\buildSrc\build\classes\kotlin\main\AndroidX.class;D:\code\ktnet\buildSrc\build\classes\kotlin\main\Http.class;D:\code\ktnet\buildSrc\build\classes\kotlin\main\Kt.class;D:\code\ktnet\buildSrc\build\classes\kotlin\main\Lifecycle.class;D:\code\ktnet\buildSrc\build\classes\kotlin\main\Versions.class

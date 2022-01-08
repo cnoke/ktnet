@@ -1,0 +1,52 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+}
+
+android {
+    compileSdkVersion Versions.compileSdkVersion
+    buildToolsVersion Versions.buildToolsVersion
+
+    defaultConfig {
+        applicationId "com.cnoke.ktnet"
+        minSdkVersion Versions.minSdkVersion
+        targetSdkVersion Versions.targetSdkVersion
+        versionCode Versions.versionCode
+        versionName Versions.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation Kt.stdlibJdk8
+    implementation AndroidX.appcompat
+    implementation AndroidX.coreKtx
+    implementation AndroidX.constraintlayout
+    implementation AndroidX.material
+    //lifecycle
+    api Lifecycle.runtime
+    api Lifecycle.common
+    api Lifecycle.extensions
+    // viewModel
+    api Lifecycle.viewmodel
+    // liveData
+    api Lifecycle.livedata
+    //利用liveData发送消息
+//    api Lifecycle.unpeek
+    implementation project(':net')
+}
