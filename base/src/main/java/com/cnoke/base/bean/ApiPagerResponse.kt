@@ -1,4 +1,4 @@
-package com.cnoke.ktnet
+package com.cnoke.base
 
 import java.io.Serializable
 
