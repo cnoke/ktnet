@@ -31,10 +31,9 @@ android {
 dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-//    api 'androidx.annotation:annotation:1.2.0'
     // 协程基础库
-    api Kt.coroutineCore
-    api Kt.coroutineAndroid
+    compileOnly Kt.coroutineCore
+    compileOnly Kt.coroutineAndroid
     api Http.retrofit
     api Http.retrofitGson
 }

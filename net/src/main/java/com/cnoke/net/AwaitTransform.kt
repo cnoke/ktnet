@@ -403,6 +403,20 @@ suspend fun <T> Await<T>.async(
     await()
 }
 
+suspend fun <T> Await<T>.tryAsync(
+    scope: CoroutineScope,
+    onCatch: ((Throwable) -> Unit)? = null,
+    context: CoroutineContext = SupervisorJob(scope.coroutineContext[Job]),
+    start: CoroutineStart = CoroutineStart.DEFAULT
+): Deferred<T?> = scope.async(context, start) {
+    try {
+        await()
+    } catch (e: Throwable) {
+        onCatch?.invoke(e)
+        null
+    }
+}
+
 suspend fun <T> Await<T>.awaitResult(): Result<T> = runCatching { await() }
 
 suspend fun <T> Await<T>.awaitResult(onSuccess: (value: T) -> Unit): Result<T> =

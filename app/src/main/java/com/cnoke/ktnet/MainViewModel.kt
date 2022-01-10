@@ -1,16 +1,13 @@
 package com.cnoke.ktnet
 
 import android.util.Log
-import com.cnoke.base.MyGsonResponseBodyConverter
-import com.cnoke.base.bean.ApiResponse
+import androidx.lifecycle.viewModelScope
+import com.cnoke.base.NetDelegates
 import com.cnoke.base.viewmodel.BaseViewModel
-import com.cnoke.net.await
-import com.cnoke.net.factory.ApiResultCallAdapterFactory
-import com.cnoke.net.factory.GsonConverterFactory
-import com.cnoke.net.interception.HeadInterceptor
-import com.cnoke.net.interception.LogInterceptor
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
+import com.cnoke.net.async
+import com.cnoke.net.tryAwait
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 /**
  * @date on 2022/1/8
@@ -20,45 +17,84 @@ import retrofit2.Retrofit
  */
 class MainViewModel : BaseViewModel() {
 
-    fun banner(){
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(HeadInterceptor())
-            .addInterceptor(LogInterceptor())
-            .build()
+    private val service : TestServer by NetDelegates()
 
-        val retrofit = Retrofit.Builder()
-            .client(okHttpClient)
-            .baseUrl("https://www.wanandroid.com/")
-            .addCallAdapterFactory(ApiResultCallAdapterFactory())
-            .addConverterFactory(
-                GsonConverterFactory.create(
-                ApiResponse::class.java,
-                MyGsonResponseBodyConverter()
-            ))
-            .build()
-        val service: TestServer = retrofit.create(TestServer::class.java)
+    fun oldBanner(){
+        viewModelScope.launch {
+            //传统模式使用retrofit需要try catch
 
-        ktHttpRequest {
-            val awaitBanner = service.awaitBanner().await {
-                Log.e("awaitBanner",it.toString())
-                listOf()
+            val bannerAsync1 = async {
+                var result : List<Banner>? = null
+                kotlin.runCatching {
+                   service.banner()
+                }.onFailure {
+                    Log.e("banner",it.toString())
+                }.onSuccess {
+                    result = it
+                }
+                result
             }
 
-            awaitBanner.let {
+            val bannerAsync2 = async {
+                var result : List<Banner>? = null
+                kotlin.runCatching {
+                    service.banner()
+                }.onFailure {
+                    Log.e("banner",it.toString())
+                }.onSuccess {
+                    result = it
+                }
+                result
+            }
+
+            bannerAsync1.await()
+            bannerAsync2.await()
+        }
+    }
+
+    fun banner(){
+
+        ktHttpRequest {
+
+            //单独处理异常 tryAwait会处理异常，如果异常返回空
+            val awaitBanner = service.awaitBanner().tryAwait()
+            awaitBanner?.let {
                 for(banner in it){
                     Log.e("awaitBanner",banner.title)
                 }
             }
 
+            /**
+             * 不处理异常 异常会直接抛出，给ktHttpRequest统一处理，
+             * 回调到baseActivity中的initLoadingUiChange。进行网络异常界面展示
+             */
+            val awaitBannerError = service.awaitBanner().await()
+        }
+    }
 
-            kotlin.runCatching {
-                val banner = service.banner()
-                for(item in banner){
-                    Log.e("banner",item.title)
-                }
-            }.onFailure {
-                Log.e("banner",it.toString())
-            }
+    /**
+     * 串行 await
+     */
+    fun serial(){
+        ktHttpRequest {
+            //先调用第一个接口await
+            val awaitBanner1 = service.awaitBanner().await()
+            //第一个接口完成后调用第二个接口
+            val awaitBanner2 = service.awaitBanner().await()
+        }
+    }
+
+    /**
+     * 并行 async
+     */
+    fun parallel(){
+        ktHttpRequest {
+            val awaitBanner1 = service.awaitBanner().async(this)
+            val awaitBanner2 = service.awaitBanner().async(this)
+
+            //两个接口一起调用
+            awaitBanner1.await()
+            awaitBanner2.await()
         }
     }
 }

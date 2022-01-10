@@ -14,7 +14,10 @@ import java.lang.NullPointerException
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-class GsonConverterFactory private constructor(private var responseCz : Class<*>,var responseConverter : GsonResponseBodyConverter, private val gson: Gson) : Converter.Factory() {
+class GsonConverterFactory private constructor(private var responseCz : Class<*>
+,var responseConverter : GsonResponseBodyConverter
+,var requestBodyConverter: GsonRequestBodyConverter
+, private val gson: Gson) : Converter.Factory() {
 
     override fun responseBodyConverter(
         type: Type, annotations: Array<Annotation>,
@@ -42,7 +45,7 @@ class GsonConverterFactory private constructor(private var responseCz : Class<*>
         retrofit: Retrofit
     ): Converter<*, RequestBody> {
         val adapter = gson.getAdapter(TypeToken.get(type))
-        return GsonRequestBodyConverter(gson, adapter)
+        return requestBodyConverter.init(gson, adapter as TypeAdapter<Any>)
     }
 
     companion object {
@@ -55,9 +58,15 @@ class GsonConverterFactory private constructor(private var responseCz : Class<*>
          * decoding from JSON (when no charset is specified by a header) will use UTF-8.
          */
         @JvmOverloads  // Guarding public API nullability.
-        fun create(responseCz : Class<*>, responseConverter : GsonResponseBodyConverter, gson: Gson? = Gson()): GsonConverterFactory {
+        fun create(responseCz : Class<*>, responseConverter : GsonResponseBodyConverter
+                   , requestBodyConverter: GsonRequestBodyConverter? =null
+                   , gson: Gson? = Gson()): GsonConverterFactory {
             if (gson == null) throw NullPointerException("gson == null")
-            return GsonConverterFactory(responseCz,responseConverter,gson)
+            var myRequestBodyConverter = requestBodyConverter
+            if (myRequestBodyConverter == null) {
+                myRequestBodyConverter =  GsonRequestBodyConverter()
+            }
+            return GsonConverterFactory(responseCz,responseConverter,myRequestBodyConverter,gson)
         }
     }
 }

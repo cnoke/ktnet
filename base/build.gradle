@@ -29,6 +29,10 @@ android {
 }
 
 dependencies {
+    api Kt.stdlibJdk8
+    api Kt.reflect
+    api Kt.coroutineCore
+    api Kt.coroutineAndroid
 
     api AndroidX.appcompat
     api AndroidX.coreKtx
@@ -42,7 +46,6 @@ dependencies {
     api Lifecycle.viewmodel
     // liveData
     api Lifecycle.livedata
-    //利用liveData发送消息
-//    api Lifecycle.unpeek
-    api project(':net')
+
+    api Http.ktNet
 }

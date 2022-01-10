@@ -35,6 +35,7 @@ object AndroidX {
 object Kt {
     val stdlibJdk7 = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}"
     val stdlibJdk8 = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}"
+    val reflect = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
     val test = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin}"
     val plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
     val coroutineCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutine}"
@@ -59,5 +60,6 @@ object Http{
     val okhttp = "com.squareup.okhttp3:okhttp:4.9.1"
     val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
     val retrofitGson = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
+    val ktNet = "io.github.cnoke.ktnet:api:1.1.0"
 }
 

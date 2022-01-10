@@ -11,12 +11,20 @@ import java.io.OutputStreamWriter
 import java.io.Writer
 import java.nio.charset.Charset
 
-class GsonRequestBodyConverter<T> internal constructor(
-    private val gson: Gson,
-    private val adapter: TypeAdapter<T>
-) : Converter<T, RequestBody> {
+class GsonRequestBodyConverter : Converter<Any, RequestBody> {
+
+
+    protected lateinit var gson: Gson
+    protected lateinit var adapter: TypeAdapter<Any>
+
+    fun init(gson: Gson,adapter: TypeAdapter<Any>): GsonRequestBodyConverter {
+        this.gson = gson
+        this.adapter = adapter
+        return this
+    }
+
     @Throws(IOException::class)
-    override fun convert(value: T): RequestBody {
+    override fun convert(value: Any): RequestBody {
         val buffer = Buffer()
         val writer: Writer = OutputStreamWriter(buffer.outputStream(), UTF_8)
         val jsonWriter = gson.newJsonWriter(writer)

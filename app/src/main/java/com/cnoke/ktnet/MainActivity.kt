@@ -33,5 +33,6 @@ class MainActivity : BaseActivity<MainViewModel>() {
         view.setOnClickListener {
             mViewModel.banner()
         }
+
     }
 }
